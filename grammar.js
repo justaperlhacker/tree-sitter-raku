@@ -1297,6 +1297,8 @@ module.exports = grammar({
     string_literal: $ => seq(
       choice(
         seq('q', $._quotelike_begin),
+        // Raku's `Q` quote (no interpolation, no escapes)
+        seq('Q', $._quotelike_begin),
         $._apostrophe
       ),
       optional(stringContent($, $._noninterpolated_string_content)),
