@@ -192,7 +192,9 @@ module.exports = grammar({
     [$.loop_statement, $._term],
     [$.elsif, $._term],
     [$._for_initializer, $._variables],
-    [$.for_statement, $._term]
+    [$.for_statement, $._term],
+    [$.reduction_expression],
+    [$._reduction_op, $.whatever]
   ],
   rules: {
     source_file: $ => seq(repeat($._fullstmt), optional($.__DATA__)),
@@ -606,6 +608,7 @@ module.exports = grammar({
       $.whatever,
       $.pointy_block,
       $.named_argument,
+      $.reduction_expression,
       $.require_expression,
       $.require_version_expression,
       /* UNIOPSUB
@@ -986,6 +989,13 @@ module.exports = grammar({
       $.bareword,
     ),
 
+    _reduction_op: $ => choice(
+      '+', '-', $._GLOB_STAR, '/', $._HASH_PERCENT, '**', '~', '>',
+      '>=', '==', '!=', '|', $._SUB_AMPER, '^', 'xx', 'Z', 'X',
+      'gcd', 'lcm', 'min', 'max', 'eq', 'ne', 'lt', 'le', 'gt', 'ge',
+      'and', 'or',
+    ),
+
     _operator_name: $ => seq(
       choice('infix', 'prefix', 'postfix', 'circumfix', 'postcircumfix', 'term'),
       ':',
@@ -996,6 +1006,14 @@ module.exports = grammar({
     // Raku's Whatever star (`*`) used as a term, e.g. `map(* + 1)` or
     // `where * > 0`.
     whatever: $ => $._GLOB_STAR,
+
+    // Raku reduction metaoperator: `[+] 1, 2, 3`, `[~] <a b c>`, `[<] @x`
+    reduction_expression: $ => seq(
+      '[',
+      field('operator', $._reduction_op),
+      ']',
+      optional(field('operand', $._term)),
+    ),
 
     // Raku named argument: `:name`, `:name(value)`, `:name<value>`, `:$var`
     named_argument: $ => choice(
