@@ -706,9 +706,16 @@ module.exports = grammar({
     postinc_expression: $ =>
       prec(TERMPREC.POSTINC, unop_post(choice('++', '--'), $._term)),
 
-    conditional_expression: $ => prec.right(TERMPREC.QUESTION_MARK, seq(
-      field('condition', $._term), '?', field('consequent', $._term), ':', field('alternative', $._term)
-    )),
+    conditional_expression: $ => choice(
+      // Perl-style ternary
+      prec.right(TERMPREC.QUESTION_MARK, seq(
+        field('condition', $._term), '?', field('consequent', $._term), ':', field('alternative', $._term)
+      )),
+      // Raku ternary
+      prec.right(TERMPREC.QUESTION_MARK, seq(
+        field('condition', $._term), '??', field('consequent', $._term), '!!', field('alternative', $._term)
+      )),
+    ),
 
     refgen_expression: $ => prec.left(TERMPREC.UMINUS, seq('\\', choice(alias($.amper_sub, $.function), $._term))), // _REFGEN
 
