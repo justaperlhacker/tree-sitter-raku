@@ -76,6 +76,11 @@ const aliasMany = (to, tokens) => tokens.map(t => alias(t, to))
 const subExtensions = () => repeat(choice('extended', 'async', 'multi', 'proto', 'only'))
 const paramType = ($) => optional(field('type', $.bareword))
 const typeParams = ($) => optional(seq('[', optional(seq($._type_parameter, repeat(seq(',', $._type_parameter)), optional(','))), ']'))
+const paramSuffix = ($) => seq(
+  optional(choice('?', '!')),
+  optseq('where', field('constraint', $._term)),
+  repeat(seq('is', field('trait', $.bareword), optseq('(', optional(field('arguments', $._expr)), ')'))),
+)
 const traits = ($) => repeat(choice(
   seq(choice('is', 'does'), field('trait', $.bareword), optseq('(', optional(field('arguments', $._expr)), ')')),
   seq('handles', field('handles', $._term)),
@@ -296,25 +301,20 @@ module.exports = grammar({
     mandatory_parameter: $ => seq(
       paramType($),
       alias(choice('$', $._signature_scalar), $.scalar),
+      paramSuffix($),
     ),
-    optional_parameter: $ => choice(
-      seq(
-        paramType($),
-        alias($._signature_scalar, $.scalar),
-        choice('=', '||=', '//='),
-        field('default', $._term),
-      ),
-      seq(
-        paramType($),
-        alias('$', $.scalar),
-        choice('=', '||=', '//='),
-        field('default', optional($._term))
-      )
+    optional_parameter: $ => seq(
+      paramType($),
+      alias(choice('$', $._signature_scalar), $.scalar),
+      paramSuffix($),
+      choice('=', '||=', '//='),
+      field('default', optional($._term)),
     ),
     named_parameter: $ => seq(
       paramType($),
       ':',
       alias($._signature_scalar, $.scalar),
+      paramSuffix($),
       optseq(
         choice('=', '||=', '//='),
         field('default', $._term),
@@ -327,7 +327,8 @@ module.exports = grammar({
       choice(
         alias(choice('@', $._signature_array), $.array),
         alias(choice($._HASH_PERCENT, $._signature_hash), $.hash)
-      )
+      ),
+      paramSuffix($),
     ),
 
     _signature_vars: $ => choice(
