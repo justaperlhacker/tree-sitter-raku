@@ -182,7 +182,12 @@ module.exports = grammar({
     [$.optional_parameter],
     // paren-less Raku `for` vs c-style `for my (...)`
     [$._for_initializer, $._decl_variable_list],
-    [$._indirob, $.varname]
+    [$._indirob, $.varname],
+    [$.conditional_statement, $._term],
+    [$.loop_statement, $._term],
+    [$.elsif, $._term],
+    [$._for_initializer, $._variables],
+    [$.for_statement, $._term]
   ],
   rules: {
     source_file: $ => seq(repeat($._fullstmt), optional($.__DATA__)),
@@ -368,12 +373,21 @@ module.exports = grammar({
     ),
 
     conditional_statement: $ =>
-      seq($._conditionals, '(', field('condition', $._expr), ')',
+      seq($._conditionals,
+        choice(
+          seq('(', field('condition', $._expr), ')'),
+          field('condition', $._expr)
+        ),
         field('block', $.block),
         optional($._else)
       ),
     _loop_body: $ => seq(field('block', $.block), optseq('continue', field('continue', $.block))),
-    loop_statement: $ => seq($._loops, '(', field('condition', $._expr), ')', $._loop_body),
+    loop_statement: $ => seq($._loops,
+      choice(
+        seq('(', field('condition', $._expr), ')'),
+        field('condition', $._expr)
+      ),
+      $._loop_body),
     cstyle_for_statement: $ =>
       seq($._KW_FOR,
         '(',
@@ -390,7 +404,10 @@ module.exports = grammar({
     for_statement: $ =>
       seq($._KW_FOR,
         optional($._for_initializer),
-        '(', field('list', $._expr), ')',
+        choice(
+          seq('(', field('list', $._expr), ')'),
+          field('list', $._expr)
+        ),
         $._loop_body
       ),
 
@@ -442,7 +459,11 @@ module.exports = grammar({
     _else: $ => choice($.else, $.elsif),
     else: $ => seq('else', field('block', $.block)),
     elsif: $ =>
-      seq('elsif', '(', field('condition', $._expr), ')',
+      seq('elsif',
+        choice(
+          seq('(', field('condition', $._expr), ')'),
+          field('condition', $._expr)
+        ),
         field('block', $.block),
         optional($._else)
       ),
@@ -634,7 +655,7 @@ module.exports = grammar({
         [prec.left, binop, choice('|', '^'), TERMPREC.BITOROP], // _BITORDOP
         [prec.left, binop, '&', TERMPREC.BITANDOP], // _BITANDOP
         [prec.left, binop, choice('<<', '>>'), TERMPREC.SHIFTOP], // _SHIFTOP
-        [prec.left, binop, choice('+', '-', '.', '~'), TERMPREC.ADDOP], // _ADDOP
+        [prec.left, binop, choice('+', '-', '~'), TERMPREC.ADDOP], // _ADDOP
         [prec.left, binop, choice('*', '/', '%', 'x'), TERMPREC.MULOP], // _MULOP
         [prec.left, binop, choice('=~', '!~'), TERMPREC.MATCHOP], // _MATCHOP
       ]
@@ -899,13 +920,30 @@ module.exports = grammar({
     // we only parse a function if it won't be an indirob
     function: $ => $._bareword,
 
-    method_call_expression: $ => prec.left(TERMPREC.ARROW, seq(
-      field('invocant', $._term),
-      token.immediate('->'),
-      optional('&'),
-      field('method', $.method),
-      optseq('(', optional(field('arguments', $._expr)), ')')
-    )),
+    method_call_expression: $ => choice(
+      prec.left(TERMPREC.ARROW, seq(
+        field('invocant', $._term),
+        token.immediate('->'),
+        optional('&'),
+        field('method', $.method),
+        optseq('(', optional(field('arguments', $._expr)), ')')
+      )),
+      // Raku method call: `$obj.method(...)`
+      prec.left(TERMPREC.ARROW, seq(
+        field('invocant', $._term),
+        '.',
+        field('method', $.method),
+        optseq('(', optional(field('arguments', $._expr)), ')')
+      )),
+      // Raku indirect method call: `$obj.method: args`
+      prec.left(TERMPREC.ARROW, seq(
+        field('invocant', $._term),
+        '.',
+        field('method', $.method),
+        ':',
+        field('arguments', $._listexpr)
+      )),
+    ),
     method: $ => choice($._bareword, $.scalar),
 
     // Raku's Whatever star (`*`) used as a term, e.g. `map(* + 1)` or
