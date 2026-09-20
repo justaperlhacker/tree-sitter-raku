@@ -175,7 +175,14 @@ module.exports = grammar({
     // these are all dynamic handling for continue BLOCK vs func0 b/c we don't get lookahead
     [$._loop_body],
     // we need an extra lookahead so we can correctly hide the `->` in a non-interpolating case
-    [$._interp_arrow, $._interpolation_fallbacks]
+    [$._interp_arrow, $._interpolation_fallbacks],
+    // `*` as Whatever star vs the start of a glob `*foo`
+    [$.whatever, $.glob],
+    // pointy block `-> $x = default { ... }` needs lookahead
+    [$.optional_parameter],
+    // paren-less Raku `for` vs c-style `for my (...)`
+    [$._for_initializer, $._decl_variable_list],
+    [$._indirob, $.varname]
   ],
   rules: {
     source_file: $ => seq(repeat($._fullstmt), optional($.__DATA__)),
@@ -198,6 +205,8 @@ module.exports = grammar({
       $.role_statement,
       $.class_phaser_statement,
       $.has_declaration,
+      $.constant_declaration,
+      $.subset_declaration,
       $.use_version_statement,
       $.use_statement,
       $.subroutine_declaration_statement,
@@ -210,6 +219,7 @@ module.exports = grammar({
       $.loop_statement,
       $.cstyle_for_statement,
       $.for_statement,
+      $.for_raku_statement,
       $.try_statement,
       alias($.block, $.block_statement),
       seq($.expression_statement, choice($._semicolon, $.__DATA__)),
@@ -384,6 +394,19 @@ module.exports = grammar({
         $._loop_body
       ),
 
+    // Raku paren-less pointy `for`: `for @list -> $x { ... }`
+    for_raku_statement: $ => prec.dynamic(2, seq(
+      $._KW_FOR,
+      field('list', $._term),
+      '->',
+      optional(seq(
+        $._signature_vars,
+        repeat(seq(',', $._signature_vars)),
+        optional(','))
+      ),
+      field('block', $.block),
+    )),
+
     try_statement: $ => seq(
       'try',
       field('try_block', $.block),
@@ -466,6 +489,7 @@ module.exports = grammar({
     hash_element_expression: $ => choice(
       // perly.y matches scalar '{' expr '}' here but that would yield a scalar var node
       seq(field('hash', $.container_variable), token.immediate('{'), field('key', $._hash_key), '}'),
+      seq(field('hash', $.container_variable), alias(token.immediate(/<[^>\n]*>/), $.autoquoted_bareword)),
       prec.left(TERMPREC.ARROW, seq($._term, '->', token.immediate('{'), field('key', $._hash_key), '}')),
       seq($.subscripted, token.immediate('{'), field('key', $._hash_key), '}'),
     ),
@@ -486,6 +510,7 @@ module.exports = grammar({
     slice_expression: $ => choice(
       seq(field('array', $.slice_container_variable), '[', $._expr, ']'),
       seq(field('hash', $.slice_container_variable), token.immediate('{'), $._hash_key, '}'),
+      seq(field('hash', $.slice_container_variable), alias(token.immediate(/<[^>\n]*>/), $.autoquoted_bareword)),
       prec.left(TERMPREC.ARROW,
         seq(field('arrayref', $._term), '->', '@', '[', $._expr, ']')),
       prec.left(TERMPREC.ARROW,
@@ -495,6 +520,7 @@ module.exports = grammar({
     keyval_expression: $ => choice(
       seq(field('array', $.keyval_container_variable), '[', $._expr, ']'),
       seq(field('hash', $.keyval_container_variable), token.immediate('{'), $._hash_key, '}'),
+      seq(field('hash', $.keyval_container_variable), alias(token.immediate(/<[^>\n]*>/), $.autoquoted_bareword)),
       prec.left(TERMPREC.ARROW,
         seq(field('arrayref', $._term), '->', '%', '[', $._expr, ']')),
       prec.left(TERMPREC.ARROW,
@@ -541,6 +567,8 @@ module.exports = grammar({
        * UNIOP block
        * UNIOP term
        */
+      $.whatever,
+      $.pointy_block,
       $.require_expression,
       $.require_version_expression,
       /* UNIOPSUB
@@ -715,6 +743,29 @@ module.exports = grammar({
       $._semicolon
     ),
 
+    // `constant $PI = 3.14;`, `constant Answer = 42;`, `my constant @x = ...;`
+    constant_declaration: $ => seq(
+      optional(choice('my', 'our')),
+      'constant',
+      field('name', choice(
+        alias($._declare_scalar, $.scalar),
+        alias($._declare_array, $.array),
+        alias($._declare_hash, $.hash),
+        $.bareword,
+      )),
+      optseq('=', field('value', $._expr)),
+      $._semicolon
+    ),
+
+    // `subset Positive of Int where * > 0;`
+    subset_declaration: $ => seq(
+      'subset',
+      field('name', $.bareword),
+      optseq('of', field('base', $.bareword)),
+      optseq('where', field('constraint', $._expr)),
+      $._semicolon
+    ),
+
     variable_declaration: $ => prec.left(TERMPREC.QUESTION_MARK + 1,
       seq(
         choice('my', 'state', 'our', 'field'),
@@ -850,12 +901,27 @@ module.exports = grammar({
 
     method_call_expression: $ => prec.left(TERMPREC.ARROW, seq(
       field('invocant', $._term),
-      '->',
+      token.immediate('->'),
       optional('&'),
       field('method', $.method),
       optseq('(', optional(field('arguments', $._expr)), ')')
     )),
     method: $ => choice($._bareword, $.scalar),
+
+    // Raku's Whatever star (`*`) used as a term, e.g. `map(* + 1)` or
+    // `where * > 0`.
+    whatever: $ => $._GLOB_STAR,
+
+    // Raku pointy block: `-> $x, $y { ... }`
+    pointy_block: $ => seq(
+      '->',
+      optional(seq(
+        $._signature_vars,
+        repeat(seq(',', $._signature_vars)),
+        optional(','))
+      ),
+      field('block', $.block),
+    ),
 
     _variables: $ => choice(
       $.scalar,
