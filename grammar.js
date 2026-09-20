@@ -192,6 +192,8 @@ module.exports = grammar({
     [$.whatever, $.glob],
     // pointy block `-> $x = default { ... }` needs lookahead
     [$.optional_parameter],
+    // chained subscripts: which container node wins for `@a[0][1]` etc.
+    [$.array_element_expression, $.hash_element_expression, $.slice_expression, $.keyval_expression],
     // paren-less Raku `for` vs c-style `for my (...)`
     [$._for_initializer, $._decl_variable_list],
     [$._indirob, $.varname],
@@ -201,7 +203,10 @@ module.exports = grammar({
     [$._for_initializer, $._variables],
     [$.for_statement, $._term],
     [$.reduction_expression],
-    [$._reduction_op, $.whatever]
+    [$._reduction_op, $.whatever],
+    [$.array_element_expression, $.hash_element_expression],
+    [$.slice_expression, $.keyval_expression],
+    [$.array_element_expression, $.slice_expression, $.keyval_expression]
   ],
   rules: {
     source_file: $ => seq(repeat($._fullstmt), optional($.__DATA__)),
@@ -528,6 +533,10 @@ module.exports = grammar({
       seq(field('array', $.container_variable), '[', field('index', $._expr), ']'),
       prec.left(TERMPREC.ARROW, seq($._term, '->', '[', field('index', $._expr), ']')),
       seq($.subscripted, '[', field('index', $._expr), ']'),
+      // chained subscript: `@a[0][1]`, `%h<a>[0]`
+      seq($.slices, '[', field('index', $._expr), ']'),
+      seq($.slices, token.immediate('{'), field('key', $._hash_key), '}'),
+      seq($.slices, alias(token.immediate(/<[^>\n]*>/), $.autoquoted_bareword)),
     ),
     _hash_key: $ => choice($._brace_autoquoted, $._expr),
     hash_element_expression: $ => choice(
@@ -536,6 +545,9 @@ module.exports = grammar({
       seq(field('hash', $.container_variable), alias(token.immediate(/<[^>\n]*>/), $.autoquoted_bareword)),
       prec.left(TERMPREC.ARROW, seq($._term, '->', token.immediate('{'), field('key', $._hash_key), '}')),
       seq($.subscripted, token.immediate('{'), field('key', $._hash_key), '}'),
+      // chained subscript: `%h<a><b>`, `@a[0]<b>`
+      seq($.slices, token.immediate('{'), field('key', $._hash_key), '}'),
+      seq($.slices, alias(token.immediate(/<[^>\n]*>/), $.autoquoted_bareword)),
     ),
     coderef_call_expression: $ => choice(
       prec.left(TERMPREC.ARROW, seq($._term, '->', '(', optional(field('arguments', $._expr)), ')')),
@@ -553,6 +565,9 @@ module.exports = grammar({
     slice_container_variable: $ => seq('@', $._var_indirob),
     slice_expression: $ => choice(
       seq(field('array', $.slice_container_variable), '[', $._expr, ']'),
+      seq($.slices, '[', field('index', $._expr), ']'),
+      seq($.slices, token.immediate('{'), field('key', $._hash_key), '}'),
+      seq($.slices, alias(token.immediate(/<[^>\n]*>/), $.autoquoted_bareword)),
       seq(field('hash', $.slice_container_variable), token.immediate('{'), $._hash_key, '}'),
       seq(field('hash', $.slice_container_variable), alias(token.immediate(/<[^>\n]*>/), $.autoquoted_bareword)),
       prec.left(TERMPREC.ARROW,
@@ -563,6 +578,9 @@ module.exports = grammar({
     keyval_container_variable: $ => seq($._HASH_PERCENT, $._var_indirob),
     keyval_expression: $ => choice(
       seq(field('array', $.keyval_container_variable), '[', $._expr, ']'),
+      seq($.slices, '[', field('index', $._expr), ']'),
+      seq($.slices, token.immediate('{'), field('key', $._hash_key), '}'),
+      seq($.slices, alias(token.immediate(/<[^>\n]*>/), $.autoquoted_bareword)),
       seq(field('hash', $.keyval_container_variable), token.immediate('{'), $._hash_key, '}'),
       seq(field('hash', $.keyval_container_variable), alias(token.immediate(/<[^>\n]*>/), $.autoquoted_bareword)),
       prec.left(TERMPREC.ARROW,
