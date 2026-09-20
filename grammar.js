@@ -76,6 +76,7 @@ const aliasMany = (to, tokens) => tokens.map(t => alias(t, to))
 const subExtensions = () => repeat(choice('extended', 'async', 'multi', 'proto', 'only'))
 const paramType = ($) => optional(field('type', $.bareword))
 const typeParams = ($) => optional(seq('[', optional(seq($._type_parameter, repeat(seq(',', $._type_parameter)), optional(','))), ']'))
+const angleKey = ($) => alias(token.immediate(/<[^>\n]*>/), $.autoquoted_bareword)
 const paramSuffix = ($) => seq(
   optional(choice('?', '!')),
   optseq('where', field('constraint', $._term)),
@@ -102,7 +103,6 @@ module.exports = grammar({
     // $.variables, // TODO - i don't know why, but these just went crazy
     $.postfix_deref,
     $.subscripted,
-    $.slices,
   ],
   word: $ => $._identifier,
   inline: $ => [
@@ -192,8 +192,6 @@ module.exports = grammar({
     [$.whatever, $.glob],
     // pointy block `-> $x = default { ... }` needs lookahead
     [$.optional_parameter],
-    // chained subscripts: which container node wins for `@a[0][1]` etc.
-    [$.array_element_expression, $.hash_element_expression, $.slice_expression, $.keyval_expression],
     // paren-less Raku `for` vs c-style `for my (...)`
     [$._for_initializer, $._decl_variable_list],
     [$._indirob, $.varname],
@@ -203,10 +201,7 @@ module.exports = grammar({
     [$._for_initializer, $._variables],
     [$.for_statement, $._term],
     [$.reduction_expression],
-    [$._reduction_op, $.whatever],
-    [$.array_element_expression, $.hash_element_expression],
-    [$.slice_expression, $.keyval_expression],
-    [$.array_element_expression, $.slice_expression, $.keyval_expression]
+    [$._reduction_op, $.whatever]
   ],
   rules: {
     source_file: $ => seq(repeat($._fullstmt), optional($.__DATA__)),
@@ -518,6 +513,8 @@ module.exports = grammar({
       $.hash_element_expression,
       $.coderef_call_expression,
       $.anonymous_slice_expression,
+      $.slice_expression,
+      $.keyval_expression,
     ),
 
     // NOTE - we have container_variable as a named node so we can match against it nicely
@@ -533,21 +530,16 @@ module.exports = grammar({
       seq(field('array', $.container_variable), '[', field('index', $._expr), ']'),
       prec.left(TERMPREC.ARROW, seq($._term, '->', '[', field('index', $._expr), ']')),
       seq($.subscripted, '[', field('index', $._expr), ']'),
-      // chained subscript: `@a[0][1]`, `%h<a>[0]`
-      seq($.slices, '[', field('index', $._expr), ']'),
-      seq($.slices, token.immediate('{'), field('key', $._hash_key), '}'),
-      seq($.slices, alias(token.immediate(/<[^>\n]*>/), $.autoquoted_bareword)),
     ),
     _hash_key: $ => choice($._brace_autoquoted, $._expr),
     hash_element_expression: $ => choice(
       // perly.y matches scalar '{' expr '}' here but that would yield a scalar var node
       seq(field('hash', $.container_variable), token.immediate('{'), field('key', $._hash_key), '}'),
-      seq(field('hash', $.container_variable), alias(token.immediate(/<[^>\n]*>/), $.autoquoted_bareword)),
+      seq(field('hash', $.container_variable), angleKey($)),
       prec.left(TERMPREC.ARROW, seq($._term, '->', token.immediate('{'), field('key', $._hash_key), '}')),
       seq($.subscripted, token.immediate('{'), field('key', $._hash_key), '}'),
-      // chained subscript: `%h<a><b>`, `@a[0]<b>`
-      seq($.slices, token.immediate('{'), field('key', $._hash_key), '}'),
-      seq($.slices, alias(token.immediate(/<[^>\n]*>/), $.autoquoted_bareword)),
+      // chained angle subscript: `%h<a><b>`, `@a[0]<b>`
+      seq($.subscripted, angleKey($)),
     ),
     coderef_call_expression: $ => choice(
       prec.left(TERMPREC.ARROW, seq($._term, '->', '(', optional(field('arguments', $._expr)), ')')),
@@ -558,18 +550,11 @@ module.exports = grammar({
       seq(field('list', $.quoted_word_list), '[', $._expr, ']'),
     ),
 
-    slices: $ => choice(
-      $.slice_expression,
-      $.keyval_expression,
-    ),
     slice_container_variable: $ => seq('@', $._var_indirob),
     slice_expression: $ => choice(
       seq(field('array', $.slice_container_variable), '[', $._expr, ']'),
-      seq($.slices, '[', field('index', $._expr), ']'),
-      seq($.slices, token.immediate('{'), field('key', $._hash_key), '}'),
-      seq($.slices, alias(token.immediate(/<[^>\n]*>/), $.autoquoted_bareword)),
       seq(field('hash', $.slice_container_variable), token.immediate('{'), $._hash_key, '}'),
-      seq(field('hash', $.slice_container_variable), alias(token.immediate(/<[^>\n]*>/), $.autoquoted_bareword)),
+      seq(field('hash', $.slice_container_variable), angleKey($)),
       prec.left(TERMPREC.ARROW,
         seq(field('arrayref', $._term), '->', '@', '[', $._expr, ']')),
       prec.left(TERMPREC.ARROW,
@@ -578,11 +563,8 @@ module.exports = grammar({
     keyval_container_variable: $ => seq($._HASH_PERCENT, $._var_indirob),
     keyval_expression: $ => choice(
       seq(field('array', $.keyval_container_variable), '[', $._expr, ']'),
-      seq($.slices, '[', field('index', $._expr), ']'),
-      seq($.slices, token.immediate('{'), field('key', $._hash_key), '}'),
-      seq($.slices, alias(token.immediate(/<[^>\n]*>/), $.autoquoted_bareword)),
       seq(field('hash', $.keyval_container_variable), token.immediate('{'), $._hash_key, '}'),
-      seq(field('hash', $.keyval_container_variable), alias(token.immediate(/<[^>\n]*>/), $.autoquoted_bareword)),
+      seq(field('hash', $.keyval_container_variable), angleKey($)),
       prec.left(TERMPREC.ARROW,
         seq(field('arrayref', $._term), '->', '%', '[', $._expr, ']')),
       prec.left(TERMPREC.ARROW,
@@ -617,7 +599,6 @@ module.exports = grammar({
       // all the variable handlings
       $._variables,
       $.subscripted,
-      $.slices,
       $.postfix_deref,
 
       $.loopex_expression,
@@ -1107,7 +1088,7 @@ module.exports = grammar({
     // Raku named argument: `:name`, `:name(value)`, `:name<value>`, `:$var`
     named_argument: $ => choice(
       seq(':', field('name', $.bareword), optseq('(', optional(field('value', $._expr)), ')')),
-      seq(':', field('name', $.bareword), alias(token.immediate(/<[^>\n]*>/), $.autoquoted_bareword)),
+      seq(':', field('name', $.bareword), angleKey($)),
       seq(':', field('value', $.scalar)),
       seq(':!', field('name', $.bareword)),
     ),
