@@ -664,12 +664,14 @@ module.exports = grammar({
       binop(
         choice( // _ASSIGNOP
           '=', '**=',
-          '+=', '-=', '.=',
+          '+=', '-=', '.=', '~=',
           '*=', '/=', '%=', 'x=',
           '&=', '|=', '^=',
           // TODO: Also &.= |.= ^.= when enabled
           '<<=', '>>=',
           '&&=', '||=', '//=',
+          // Raku meta-assignments
+          'max=', 'min=', 'Z=', 'X=',
         ),
         $._term
       )

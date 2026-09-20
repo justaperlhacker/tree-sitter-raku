@@ -5094,6 +5094,10 @@
                 },
                 {
                   "type": "STRING",
+                  "value": "~="
+                },
+                {
+                  "type": "STRING",
                   "value": "*="
                 },
                 {
@@ -5139,6 +5143,22 @@
                 {
                   "type": "STRING",
                   "value": "//="
+                },
+                {
+                  "type": "STRING",
+                  "value": "max="
+                },
+                {
+                  "type": "STRING",
+                  "value": "min="
+                },
+                {
+                  "type": "STRING",
+                  "value": "Z="
+                },
+                {
+                  "type": "STRING",
+                  "value": "X="
                 }
               ]
             }
