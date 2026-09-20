@@ -75,6 +75,10 @@ const aliasMany = (to, tokens) => tokens.map(t => alias(t, to))
 // little helper just to keep things DRY
 const subExtensions = () => repeat(choice('extended', 'async', 'multi', 'proto', 'only'))
 const paramType = ($) => optional(field('type', $.bareword))
+const traits = ($) => repeat(choice(
+  seq(choice('is', 'does'), field('trait', $.bareword), optseq('(', optional(field('arguments', $._expr)), ')')),
+  seq('handles', field('handles', $._term)),
+))
 
 /**
  *
@@ -232,19 +236,21 @@ module.exports = grammar({
       ';', // this is not _semicolon so as not to generate an infinite stream of them
     ),
     package_statement: $ => choice(
-      seq('package', field('name', $.package), optional(field('version', $._version)), $._semicolon),
-      seq('package', field('name', $.package), optional(field('version', $._version)), $.block),
+      seq('package', field('name', $.package), optional(field('version', $._version)), traits($), $._semicolon),
+      seq('package', field('name', $.package), optional(field('version', $._version)), traits($), $.block),
     ),
     class_statement: $ => choice(
       seq('class',
         field('name', $.package),
         optional(field('version', $._version)),
         optseq(':', optional(field('attributes', $.attrlist))),
+        traits($),
         $._semicolon),
       seq('class',
         field('name', $.package),
         optional(field('version', $._version)),
         optseq(':', optional(field('attributes', $.attrlist))),
+        traits($),
         $.block),
     ),
     role_statement: $ => choice(
@@ -252,11 +258,13 @@ module.exports = grammar({
         field('name', $.package),
         optional(field('version', $._version)),
         optseq(':', optional(field('attributes', $.attrlist))),
+        traits($),
         $._semicolon),
       seq('role',
         field('name', $.package),
         optional(field('version', $._version)),
         optseq(':', optional(field('attributes', $.attrlist))),
+        traits($),
         $.block),
     ),
     class_phaser_statement: $ => seq(
@@ -338,6 +346,7 @@ module.exports = grammar({
       optseq(':', optional(field('attributes', $.attrlist))),
       optional(choice($.prototype, $.signature)),
       optional(seq('-->', field('returns', $.bareword))),
+      traits($),
       field('body', $.block),
     ),
 
@@ -349,6 +358,7 @@ module.exports = grammar({
       optseq(':', optional(field('attributes', $.attrlist))),
       optional(choice($.prototype, $.signature)),
       optional(seq('-->', field('returns', $.bareword))),
+      traits($),
       field('body', $.block),
     ),
 
@@ -590,6 +600,7 @@ module.exports = grammar({
        */
       $.whatever,
       $.pointy_block,
+      $.named_argument,
       $.require_expression,
       $.require_version_expression,
       /* UNIOPSUB
@@ -751,6 +762,7 @@ module.exports = grammar({
       alias($._declare_scalar, $.scalar),
       alias($._declare_array, $.array),
       alias($._declare_hash, $.hash),
+      alias($._declare_sigilless, $.bareword),
     ),
 
     // Raku attribute declaration: `has $.x;`, `has Int $.x = 0;`,
@@ -759,7 +771,7 @@ module.exports = grammar({
       'has',
       optional(field('type', $.bareword)),
       field('variable', $._declared_vars),
-      repeat(seq('is', field('trait', $.bareword))),
+      traits($),
       optseq('=', field('default', $._expr)),
       $._semicolon
     ),
@@ -943,12 +955,28 @@ module.exports = grammar({
         ':',
         field('arguments', $._listexpr)
       )),
+      // Raku safe/meta method calls: `$x.?maybe`, `$x.^methods`,
+      // `$x.&sub`, `$x.!defined`
+      prec.left(TERMPREC.ARROW, seq(
+        field('invocant', $._term),
+        choice('.?', '.^', '.&', '.!'),
+        field('method', $.method),
+        optseq('(', optional(field('arguments', $._expr)), ')')
+      )),
     ),
     method: $ => choice($._bareword, $.scalar),
 
     // Raku's Whatever star (`*`) used as a term, e.g. `map(* + 1)` or
     // `where * > 0`.
     whatever: $ => $._GLOB_STAR,
+
+    // Raku named argument: `:name`, `:name(value)`, `:name<value>`, `:$var`
+    named_argument: $ => choice(
+      seq(':', field('name', $.bareword), optseq('(', optional(field('value', $._expr)), ')')),
+      seq(':', field('name', $.bareword), alias(token.immediate(/<[^>\n]*>/), $.autoquoted_bareword)),
+      seq(':', field('value', $.scalar)),
+      seq(':!', field('name', $.bareword)),
+    ),
 
     // Raku pointy block: `-> $x, $y { ... }`
     pointy_block: $ => seq(
@@ -973,6 +1001,8 @@ module.exports = grammar({
       alias($._twigiled_varname, $.varname),
     ),
     scalar: $ => seq('$', $._var_indirob),
+    // Raku sigilless variable declaration: `my \x = 5;`
+    _declare_sigilless: $ => seq('\\', $.bareword),
     _declare_scalar: $ => seq('$', $.varname),
     _signature_scalar: $ => seq('$', $._signature_varname),
     array: $ => seq('@', $._var_indirob),
