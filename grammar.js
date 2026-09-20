@@ -608,6 +608,8 @@ module.exports = grammar({
       $.whatever,
       $.pointy_block,
       $.named_argument,
+      $.but_expression,
+      $.anonymous_role_expression,
       $.reduction_expression,
       $.zip_cross_expression,
       $.hyper_expression,
@@ -1022,6 +1024,16 @@ module.exports = grammar({
     // Raku's Whatever star (`*`) used as a term, e.g. `map(* + 1)` or
     // `where * > 0`.
     whatever: $ => $._GLOB_STAR,
+
+    // Raku `but` operator: `$x but True`, `$x but role { ... }`
+    but_expression: $ => prec.left(TERMPREC.QUESTION_MARK + 2, seq(
+      field('left', $._term),
+      'but',
+      field('right', $._term),
+    )),
+
+    // Raku anonymous role (used with `but`): `role { method f { } }`
+    anonymous_role_expression: $ => seq('role', field('block', $.block)),
 
     // Raku zip/cross metaoperators: `@a Z @b`, `@a Z+ @b`, `@a X~ @b`
     zip_cross_expression: $ => prec.left(TERMPREC.ADDOP, seq(

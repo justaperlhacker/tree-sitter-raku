@@ -4444,6 +4444,14 @@
         },
         {
           "type": "SYMBOL",
+          "name": "but_expression"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "anonymous_role_expression"
+        },
+        {
+          "type": "SYMBOL",
           "name": "reduction_expression"
         },
         {
@@ -8465,6 +8473,52 @@
     "whatever": {
       "type": "SYMBOL",
       "name": "_GLOB_STAR"
+    },
+    "but_expression": {
+      "type": "PREC_LEFT",
+      "value": 9,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "FIELD",
+            "name": "left",
+            "content": {
+              "type": "SYMBOL",
+              "name": "_term"
+            }
+          },
+          {
+            "type": "STRING",
+            "value": "but"
+          },
+          {
+            "type": "FIELD",
+            "name": "right",
+            "content": {
+              "type": "SYMBOL",
+              "name": "_term"
+            }
+          }
+        ]
+      }
+    },
+    "anonymous_role_expression": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "role"
+        },
+        {
+          "type": "FIELD",
+          "name": "block",
+          "content": {
+            "type": "SYMBOL",
+            "name": "block"
+          }
+        }
+      ]
     },
     "zip_cross_expression": {
       "type": "PREC_LEFT",
