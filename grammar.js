@@ -157,6 +157,8 @@ module.exports = grammar({
     $._no_interp_whitespace_zw,
     /* zero-width high priority token */
     $._NONASSOC,
+    /* opaque `{ ... }` body of token/rule/regex declarations */
+    $._regex_body,
     /* error condition must always be last; we don't use this in the grammar */
     $._ERROR
   ],
@@ -219,6 +221,8 @@ module.exports = grammar({
       $.has_declaration,
       $.constant_declaration,
       $.subset_declaration,
+      $.grammar_statement,
+      $.token_declaration,
       $.use_version_statement,
       $.use_statement,
       $.subroutine_declaration_statement,
@@ -808,6 +812,23 @@ module.exports = grammar({
       )),
       optseq('=', field('value', $._expr)),
       $._semicolon
+    ),
+
+    // Raku grammar declaration: `grammar Calc { ... }`
+    grammar_statement: $ => choice(
+      seq('grammar', field('name', $.package), optional(field('version', $._version)),
+        typeParams($), traits($), $._semicolon),
+      seq('grammar', field('name', $.package), optional(field('version', $._version)),
+        typeParams($), traits($), $.block),
+    ),
+
+    // Raku grammar rule declaration: `token TOP { ... }`, `rule x { ... }`,
+    // `regex y { ... }`
+    token_declaration: $ => seq(
+      choice('token', 'rule', 'regex'),
+      field('name', $.bareword),
+      optseq(':', optional(field('attributes', $.attrlist))),
+      field('body', alias($._regex_body, $.regexp_content)),
     ),
 
     // `subset Positive of Int where * > 0;`

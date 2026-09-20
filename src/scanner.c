@@ -69,6 +69,8 @@ enum TokenType {
   TOKEN_NO_INTERP_WHITESPACE_ZW,
   /* zero-width high priority token */
   TOKEN_NONASSOC,
+  /* opaque `{ ... }` body of token/rule/regex declarations */
+  TOKEN_REGEX_BODY,
   /* error condition is always last */
   TOKEN_ERROR
 };
@@ -599,6 +601,32 @@ bool tree_sitter_raku_external_scanner_scan(void *payload, TSLexer *lexer,
     }
 
     return false;
+  }
+
+  if (valid_symbols[TOKEN_REGEX_BODY] && c == '{') {
+    /* Opaque, brace-balanced body for `token NAME { ... }` and friends. */
+    int depth = 0;
+    while (!lexer->eof(lexer)) {
+      if (c == '\\') {
+        ADVANCE_C;
+        if (!lexer->eof(lexer)) ADVANCE_C;
+        continue;
+      }
+      if (c == '{') {
+        depth++;
+      } else if (c == '}') {
+        depth--;
+        ADVANCE_C;
+        if (depth == 0) {
+          MARK_END;
+          TOKEN(TOKEN_REGEX_BODY);
+        }
+        continue;
+      }
+      ADVANCE_C;
+    }
+    MARK_END;
+    TOKEN(TOKEN_REGEX_BODY);
   }
 
   if (valid_symbols[TOKEN_POD]) {
