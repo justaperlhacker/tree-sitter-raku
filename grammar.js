@@ -197,6 +197,7 @@ module.exports = grammar({
       $.class_statement,
       $.role_statement,
       $.class_phaser_statement,
+      $.has_declaration,
       $.use_version_statement,
       $.use_statement,
       $.subroutine_declaration_statement,
@@ -703,6 +704,17 @@ module.exports = grammar({
       alias($._declare_hash, $.hash),
     ),
 
+    // Raku attribute declaration: `has $.x;`, `has Int $.x = 0;`,
+    // `has @.items;`, `has %!meta;`, optionally with `is` traits.
+    has_declaration: $ => seq(
+      'has',
+      optional(field('type', $.bareword)),
+      field('variable', $._declared_vars),
+      repeat(seq('is', field('trait', $.bareword))),
+      optseq('=', field('default', $._expr)),
+      $._semicolon
+    ),
+
     variable_declaration: $ => prec.left(TERMPREC.QUESTION_MARK + 1,
       seq(
         choice('my', 'state', 'our', 'field'),
@@ -852,7 +864,10 @@ module.exports = grammar({
       $.arraylen,
       $.glob,
     ),
-    _signature_varname: $ => alias($._identifier, $.varname),
+    _signature_varname: $ => choice(
+      alias($._identifier, $.varname),
+      alias($._twigiled_varname, $.varname),
+    ),
     scalar: $ => seq('$', $._var_indirob),
     _declare_scalar: $ => seq('$', $.varname),
     _signature_scalar: $ => seq('$', $._signature_varname),
@@ -880,12 +895,20 @@ module.exports = grammar({
       // toke.c has weird code in S_scan_ident to handle the $<digits> and
       // other single-character punctuation vars like $!
       $._ident_special,
+      $._twigiled_varname,
       $.scalar,
       $.block,
     ),
     varname: $ => choice(
       $._identifier,
-      $._ident_special // TODO - not sure if we wanna make `my $1` error out
+      $._ident_special, // TODO - not sure if we wanna make `my $1` error out
+      $._twigiled_varname
+    ),
+    // Raku twigils: a punctuation char between the sigil and the name, e.g.
+    // `$!x` (private attr), `$.x` (public attr), `$?x` (compile-time),
+    // `$*x` (dynamic), `$^x` (placeholder), `$=x` (pod), etc.
+    _twigiled_varname: $ => token.immediate(
+      /[!.^?*:+=~][_\p{XID_Start}][_\p{XID_Continue}\-]*/v
     ),
     // not all indirobs are alike; for variables, they have autoquoting behavior
     _var_indirob_autoquote: $ => seq(

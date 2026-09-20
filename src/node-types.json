@@ -4170,6 +4170,10 @@
           "named": true
         },
         {
+          "type": "has_declaration",
+          "named": true
+        },
+        {
           "type": "loop_statement",
           "named": true
         },
@@ -4270,6 +4274,10 @@
         },
         {
           "type": "given_statement",
+          "named": true
+        },
+        {
+          "type": "has_declaration",
           "named": true
         },
         {
@@ -6011,6 +6019,10 @@
             "named": true
           },
           {
+            "type": "has_declaration",
+            "named": true
+          },
+          {
             "type": "loop_statement",
             "named": true
           },
@@ -6116,6 +6128,10 @@
           },
           {
             "type": "given_statement",
+            "named": true
+          },
+          {
+            "type": "has_declaration",
             "named": true
           },
           {
@@ -10245,6 +10261,292 @@
     }
   },
   {
+    "type": "has_declaration",
+    "named": true,
+    "fields": {
+      "default": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "(",
+            "named": false
+          },
+          {
+            "type": ")",
+            "named": false
+          },
+          {
+            "type": "ambiguous_function_call_expression",
+            "named": true
+          },
+          {
+            "type": "anonymous_array_expression",
+            "named": true
+          },
+          {
+            "type": "anonymous_hash_expression",
+            "named": true
+          },
+          {
+            "type": "anonymous_method_expression",
+            "named": true
+          },
+          {
+            "type": "anonymous_subroutine_expression",
+            "named": true
+          },
+          {
+            "type": "array",
+            "named": true
+          },
+          {
+            "type": "arraylen",
+            "named": true
+          },
+          {
+            "type": "assignment_expression",
+            "named": true
+          },
+          {
+            "type": "autoquoted_bareword",
+            "named": true
+          },
+          {
+            "type": "await_expression",
+            "named": true
+          },
+          {
+            "type": "bareword",
+            "named": true
+          },
+          {
+            "type": "binary_expression",
+            "named": true
+          },
+          {
+            "type": "command_heredoc_token",
+            "named": true
+          },
+          {
+            "type": "command_string",
+            "named": true
+          },
+          {
+            "type": "conditional_expression",
+            "named": true
+          },
+          {
+            "type": "do_expression",
+            "named": true
+          },
+          {
+            "type": "equality_expression",
+            "named": true
+          },
+          {
+            "type": "eval_expression",
+            "named": true
+          },
+          {
+            "type": "fileglob_expression",
+            "named": true
+          },
+          {
+            "type": "func0op_call_expression",
+            "named": true
+          },
+          {
+            "type": "func1op_call_expression",
+            "named": true
+          },
+          {
+            "type": "function_call_expression",
+            "named": true
+          },
+          {
+            "type": "glob",
+            "named": true
+          },
+          {
+            "type": "goto_expression",
+            "named": true
+          },
+          {
+            "type": "hash",
+            "named": true
+          },
+          {
+            "type": "heredoc_token",
+            "named": true
+          },
+          {
+            "type": "interpolated_string_literal",
+            "named": true
+          },
+          {
+            "type": "list_expression",
+            "named": true
+          },
+          {
+            "type": "localization_expression",
+            "named": true
+          },
+          {
+            "type": "loopex_expression",
+            "named": true
+          },
+          {
+            "type": "lowprec_logical_expression",
+            "named": true
+          },
+          {
+            "type": "map_grep_expression",
+            "named": true
+          },
+          {
+            "type": "match_regexp",
+            "named": true
+          },
+          {
+            "type": "method_call_expression",
+            "named": true
+          },
+          {
+            "type": "postfix_deref",
+            "named": true
+          },
+          {
+            "type": "postinc_expression",
+            "named": true
+          },
+          {
+            "type": "preinc_expression",
+            "named": true
+          },
+          {
+            "type": "primitive",
+            "named": true
+          },
+          {
+            "type": "quoted_regexp",
+            "named": true
+          },
+          {
+            "type": "quoted_word_list",
+            "named": true
+          },
+          {
+            "type": "readline_expression",
+            "named": true
+          },
+          {
+            "type": "refgen_expression",
+            "named": true
+          },
+          {
+            "type": "relational_expression",
+            "named": true
+          },
+          {
+            "type": "require_expression",
+            "named": true
+          },
+          {
+            "type": "require_version_expression",
+            "named": true
+          },
+          {
+            "type": "return_expression",
+            "named": true
+          },
+          {
+            "type": "scalar",
+            "named": true
+          },
+          {
+            "type": "slices",
+            "named": true
+          },
+          {
+            "type": "sort_expression",
+            "named": true
+          },
+          {
+            "type": "string_literal",
+            "named": true
+          },
+          {
+            "type": "stub_expression",
+            "named": true
+          },
+          {
+            "type": "subscripted",
+            "named": true
+          },
+          {
+            "type": "substitution_regexp",
+            "named": true
+          },
+          {
+            "type": "transliteration_expression",
+            "named": true
+          },
+          {
+            "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "undef_expression",
+            "named": true
+          },
+          {
+            "type": "variable_declaration",
+            "named": true
+          }
+        ]
+      },
+      "trait": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "bareword",
+            "named": true
+          }
+        ]
+      },
+      "type": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "bareword",
+            "named": true
+          }
+        ]
+      },
+      "variable": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "array",
+            "named": true
+          },
+          {
+            "type": "hash",
+            "named": true
+          },
+          {
+            "type": "scalar",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "hash",
     "named": true,
     "fields": {},
@@ -11106,6 +11408,10 @@
         },
         {
           "type": "given_statement",
+          "named": true
+        },
+        {
+          "type": "has_declaration",
           "named": true
         },
         {
@@ -20095,6 +20401,10 @@
           "named": true
         },
         {
+          "type": "has_declaration",
+          "named": true
+        },
+        {
           "type": "loop_statement",
           "named": true
         },
@@ -20209,6 +20519,10 @@
           },
           {
             "type": "given_statement",
+            "named": true
+          },
+          {
+            "type": "has_declaration",
             "named": true
           },
           {
@@ -22503,6 +22817,10 @@
     "named": false
   },
   {
+    "type": "has",
+    "named": false
+  },
+  {
     "type": "heredoc_end",
     "named": true
   },
@@ -22516,6 +22834,10 @@
   },
   {
     "type": "int",
+    "named": false
+  },
+  {
+    "type": "is",
     "named": false
   },
   {
