@@ -606,35 +606,37 @@ bool tree_sitter_raku_external_scanner_scan(void *payload, TSLexer *lexer,
     if (column == 0 && c == '=') {
       DEBUG("POD started...\n", 0);
 
-      /* Keep going until the linefeed after a line beginning `=cut` */
-      static const char *cut_marker = "=cut";
-      int stage = -1;
+      /* POD is terminated by a line beginning `=cut`, or by the `=end` that
+       * closes a `=begin` block (Raku's standard POD form). We track
+       * `=begin`/`=end` nesting so embedded blocks such as
+       * `=begin code ... =end code` don't terminate the POD early. */
+      int depth = 0;
+      bool first_line = true;
+      char line[64];
 
       while (!lexer->eof(lexer)) {
-        if (c == '\r')
-          ; /* ignore */
-        else if (stage < 1 && c == '\n')
-          stage = 0;
-        else if (stage >= 0 && stage < 4 && c == cut_marker[stage])
-          stage++;
-        else if (stage == 4 && (c == ' ' || c == '\t'))
-          stage = 5;
-        else if (stage == 4 && c == '\n')
-          stage = 6;
-        else
-          stage = -1;
-
-        if (stage > 4) break;
-
-        ADVANCE_C;
-      }
-      if (stage < 6)
-        while (!lexer->eof(lexer)) {
-          if (c == '\n') break;
-
+        int len = 0;
+        while (!lexer->eof(lexer) && c != '\n') {
+          if (c != '\r' && len < (int)sizeof(line) - 1) line[len++] = (char)c;
           ADVANCE_C;
         }
-      /* If we got this far then either we reached stage 6, or we're at EOF */
+        line[len] = '\0';
+        if (c == '\n') ADVANCE_C; /* consume the linefeed */
+
+        if (first_line) {
+          first_line = false;
+          if (strncmp(line, "=begin", 6) == 0) depth = 1;
+          continue;
+        }
+        if (strncmp(line, "=cut", 4) == 0) break;
+        if (strncmp(line, "=begin", 6) == 0) {
+          depth++;
+        } else if (strncmp(line, "=end", 4) == 0) {
+          depth--;
+          if (depth <= 0) break;
+        }
+      }
+      /* If we got this far then either we reached the end marker or EOF */
       TOKEN(TOKEN_POD);
     }
   }
