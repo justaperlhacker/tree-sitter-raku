@@ -342,7 +342,7 @@ module.exports = grammar({
       optional(field('lexical', 'my')),
       subExtensions(),
       'sub',
-      field('name', $.bareword),
+      field('name', choice($.bareword, $._operator_name)),
       optseq(':', optional(field('attributes', $.attrlist))),
       optional(choice($.prototype, $.signature)),
       optional(seq('-->', field('returns', $.bareword))),
@@ -972,6 +972,14 @@ module.exports = grammar({
       )),
     ),
     method: $ => choice($._bareword, $.scalar),
+
+    // Raku user-defined operator name: `infix:<+>`, `prefix:<->`, `term:<now>`
+    _operator_name: $ => seq(
+      choice('infix', 'prefix', 'postfix', 'circumfix', 'postcircumfix', 'term'),
+      ':',
+      alias(token.immediate(/<[^>\n]*>/), $.operator),
+    ),
+
 
     // Raku's Whatever star (`*`) used as a term, e.g. `map(* + 1)` or
     // `where * > 0`.

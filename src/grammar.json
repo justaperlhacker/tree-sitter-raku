@@ -1749,8 +1749,17 @@
           "type": "FIELD",
           "name": "name",
           "content": {
-            "type": "SYMBOL",
-            "name": "bareword"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "bareword"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_operator_name"
+              }
+            ]
           }
         },
         {
@@ -7766,6 +7775,56 @@
         {
           "type": "SYMBOL",
           "name": "scalar"
+        }
+      ]
+    },
+    "_operator_name": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "infix"
+            },
+            {
+              "type": "STRING",
+              "value": "prefix"
+            },
+            {
+              "type": "STRING",
+              "value": "postfix"
+            },
+            {
+              "type": "STRING",
+              "value": "circumfix"
+            },
+            {
+              "type": "STRING",
+              "value": "postcircumfix"
+            },
+            {
+              "type": "STRING",
+              "value": "term"
+            }
+          ]
+        },
+        {
+          "type": "STRING",
+          "value": ":"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "IMMEDIATE_TOKEN",
+            "content": {
+              "type": "PATTERN",
+              "value": "<[^>\\n]*>"
+            }
+          },
+          "named": true,
+          "value": "operator"
         }
       ]
     },

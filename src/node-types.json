@@ -25666,12 +25666,44 @@
         ]
       },
       "name": {
-        "multiple": false,
+        "multiple": true,
         "required": true,
         "types": [
           {
+            "type": ":",
+            "named": false
+          },
+          {
             "type": "bareword",
             "named": true
+          },
+          {
+            "type": "circumfix",
+            "named": false
+          },
+          {
+            "type": "infix",
+            "named": false
+          },
+          {
+            "type": "operator",
+            "named": true
+          },
+          {
+            "type": "postcircumfix",
+            "named": false
+          },
+          {
+            "type": "postfix",
+            "named": false
+          },
+          {
+            "type": "prefix",
+            "named": false
+          },
+          {
+            "type": "term",
+            "named": false
           }
         ]
       },
@@ -28029,6 +28061,10 @@
     "named": false
   },
   {
+    "type": "circumfix",
+    "named": false
+  },
+  {
     "type": "class",
     "named": false
   },
@@ -28278,6 +28314,10 @@
     "named": false
   },
   {
+    "type": "infix",
+    "named": false
+  },
+  {
     "type": "int",
     "named": false
   },
@@ -28394,6 +28434,10 @@
     "named": false
   },
   {
+    "type": "operator",
+    "named": true
+  },
+  {
     "type": "or",
     "named": false
   },
@@ -28420,6 +28464,18 @@
   },
   {
     "type": "pos",
+    "named": false
+  },
+  {
+    "type": "postcircumfix",
+    "named": false
+  },
+  {
+    "type": "postfix",
+    "named": false
+  },
+  {
+    "type": "prefix",
     "named": false
   },
   {
@@ -28576,6 +28632,10 @@
   },
   {
     "type": "telldir",
+    "named": false
+  },
+  {
+    "type": "term",
     "named": false
   },
   {
