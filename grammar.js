@@ -74,6 +74,7 @@ const aliasMany = (to, tokens) => tokens.map(t => alias(t, to))
 
 // little helper just to keep things DRY
 const subExtensions = () => repeat(choice('extended', 'async', 'multi', 'proto', 'only'))
+const paramType = ($) => optional(field('type', $.bareword))
 
 /**
  *
@@ -171,8 +172,6 @@ module.exports = grammar({
     [$._variables, $.indirect_object],
     [$.expression_statement, $._tricky_indirob_hashref],
     [$.autoquoted_bareword],
-    // nameless params need extra lookahead
-    [$.optional_parameter],
     // these are all dynamic handling for continue BLOCK vs func0 b/c we don't get lookahead
     [$._loop_body],
     // we need an extra lookahead so we can correctly hide the `->` in a non-interpolating case
@@ -204,7 +203,9 @@ module.exports = grammar({
       $.method_declaration_statement,
       $.phaser_statement,
       $.conditional_statement,
-      /* TODO: given/when/default */
+      $.given_statement,
+      $.when_statement,
+      $.default_statement,
       $.loop_statement,
       $.cstyle_for_statement,
       $.for_statement,
@@ -257,20 +258,26 @@ module.exports = grammar({
       $._semicolon
     ),
 
-    mandatory_parameter: $ => alias(choice('$', $._signature_scalar), $.scalar),
+    mandatory_parameter: $ => seq(
+      paramType($),
+      alias(choice('$', $._signature_scalar), $.scalar),
+    ),
     optional_parameter: $ => choice(
       seq(
+        paramType($),
         alias($._signature_scalar, $.scalar),
         choice('=', '||=', '//='),
         field('default', $._term),
       ),
       seq(
+        paramType($),
         alias('$', $.scalar),
         choice('=', '||=', '//='),
         field('default', optional($._term))
       )
     ),
     named_parameter: $ => seq(
+      paramType($),
       ':',
       alias($._signature_scalar, $.scalar),
       optseq(
@@ -279,9 +286,13 @@ module.exports = grammar({
       )
     ),
 
-    slurpy_parameter: $ => choice(
-      alias(choice('@', $._signature_array), $.array),
-      alias(choice($._HASH_PERCENT, $._signature_hash), $.hash)
+    slurpy_parameter: $ => seq(
+      paramType($),
+      optional(choice('**', '*')),
+      choice(
+        alias(choice('@', $._signature_array), $.array),
+        alias(choice($._HASH_PERCENT, $._signature_hash), $.hash)
+      )
     ),
 
     _signature_vars: $ => choice(
@@ -295,10 +306,12 @@ module.exports = grammar({
     signature: $ => seq(
       alias($._signature_start, '('),
       // we don't bother being strict about the order b/c too much work
-      repeat(seq(
+      optional(seq(
         $._signature_vars,
-        optseq(',', optional($._signature_vars)))
+        repeat(seq(',', $._signature_vars)),
+        optional(','))
       ),
+      optional(seq('-->', field('returns', $.bareword))),
       ')'
     ),
     subroutine_declaration_statement: $ => seq(
@@ -308,6 +321,7 @@ module.exports = grammar({
       field('name', $.bareword),
       optseq(':', optional(field('attributes', $.attrlist))),
       optional(choice($.prototype, $.signature)),
+      optional(seq('-->', field('returns', $.bareword))),
       field('body', $.block),
     ),
 
@@ -318,6 +332,7 @@ module.exports = grammar({
       field('name', $.bareword),
       optseq(':', optional(field('attributes', $.attrlist))),
       optional(choice($.prototype, $.signature)),
+      optional(seq('-->', field('returns', $.bareword))),
       field('body', $.block),
     ),
 
@@ -325,6 +340,21 @@ module.exports = grammar({
     // name and lacking the `sub` keyword, but most tree consumers are likely
     // to care about distinguishing it
     phaser_statement: $ => seq(field('phase', $._PHASE_NAME), $.block),
+
+    given_statement: $ => seq(
+      'given',
+      field('topic', $._expr),
+      field('block', $.block),
+    ),
+    when_statement: $ => seq(
+      'when',
+      field('condition', $._expr),
+      field('block', $.block),
+    ),
+    default_statement: $ => seq(
+      'default',
+      field('block', $.block),
+    ),
 
     conditional_statement: $ =>
       seq($._conditionals, '(', field('condition', $._expr), ')',
@@ -422,8 +452,8 @@ module.exports = grammar({
     // not an indirob
     container_variable: $ => prec(2, seq('$', $._var_indirob)),
     glob_slot_expression: $ => choice(
-      seq($.glob, '{', $._hash_key, '}'),
-      prec.left(TERMPREC.ARROW, seq($._term, '->', '*', '{', $._hash_key, '}')),
+      seq($.glob, token.immediate('{'), $._hash_key, '}'),
+      prec.left(TERMPREC.ARROW, seq($._term, '->', '*', token.immediate('{'), $._hash_key, '}')),
     ),
     array_element_expression: $ => choice(
       // perly.y matches scalar '[' expr ']' here but that would yield a scalar var node
@@ -434,9 +464,9 @@ module.exports = grammar({
     _hash_key: $ => choice($._brace_autoquoted, $._expr),
     hash_element_expression: $ => choice(
       // perly.y matches scalar '{' expr '}' here but that would yield a scalar var node
-      seq(field('hash', $.container_variable), '{', field('key', $._hash_key), '}'),
-      prec.left(TERMPREC.ARROW, seq($._term, '->', '{', field('key', $._hash_key), '}')),
-      seq($.subscripted, '{', field('key', $._hash_key), '}'),
+      seq(field('hash', $.container_variable), token.immediate('{'), field('key', $._hash_key), '}'),
+      prec.left(TERMPREC.ARROW, seq($._term, '->', token.immediate('{'), field('key', $._hash_key), '}')),
+      seq($.subscripted, token.immediate('{'), field('key', $._hash_key), '}'),
     ),
     coderef_call_expression: $ => choice(
       prec.left(TERMPREC.ARROW, seq($._term, '->', '(', optional(field('arguments', $._expr)), ')')),
@@ -454,20 +484,20 @@ module.exports = grammar({
     slice_container_variable: $ => seq('@', $._var_indirob),
     slice_expression: $ => choice(
       seq(field('array', $.slice_container_variable), '[', $._expr, ']'),
-      seq(field('hash', $.slice_container_variable), '{', $._hash_key, '}'),
+      seq(field('hash', $.slice_container_variable), token.immediate('{'), $._hash_key, '}'),
       prec.left(TERMPREC.ARROW,
         seq(field('arrayref', $._term), '->', '@', '[', $._expr, ']')),
       prec.left(TERMPREC.ARROW,
-        seq(field('hashref', $._term), '->', '@', '{', $._hash_key, '}')),
+        seq(field('hashref', $._term), '->', '@', token.immediate('{'), $._hash_key, '}')),
     ),
     keyval_container_variable: $ => seq($._HASH_PERCENT, $._var_indirob),
     keyval_expression: $ => choice(
       seq(field('array', $.keyval_container_variable), '[', $._expr, ']'),
-      seq(field('hash', $.keyval_container_variable), '{', $._hash_key, '}'),
+      seq(field('hash', $.keyval_container_variable), token.immediate('{'), $._hash_key, '}'),
       prec.left(TERMPREC.ARROW,
         seq(field('arrayref', $._term), '->', '%', '[', $._expr, ']')),
       prec.left(TERMPREC.ARROW,
-        seq(field('hashref', $._term), '->', '%', '{', $._hash_key, '}')),
+        seq(field('hashref', $._term), '->', '%', token.immediate('{'), $._hash_key, '}')),
     ),
 
     _term: $ => choice(
@@ -643,6 +673,7 @@ module.exports = grammar({
       'sub',
       optseq(':', optional(field('attributes', $.attrlist))),
       optional(choice($.prototype, $.signature)),
+      optional(seq('-->', field('returns', $.bareword))),
       field('body', $.block),
     ),
 
@@ -651,6 +682,7 @@ module.exports = grammar({
       'method',
       optseq(':', optional(field('attributes', $.attrlist))),
       optional(choice($.prototype, $.signature)),
+      optional(seq('-->', field('returns', $.bareword))),
       field('body', $.block),
     ),
 

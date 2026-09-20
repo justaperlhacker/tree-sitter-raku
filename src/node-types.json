@@ -1096,6 +1096,16 @@
             "named": true
           }
         ]
+      },
+      "returns": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "bareword",
+            "named": true
+          }
+        ]
       }
     },
     "children": {
@@ -1615,6 +1625,16 @@
         "types": [
           {
             "type": "block",
+            "named": true
+          }
+        ]
+      },
+      "returns": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "bareword",
             "named": true
           }
         ]
@@ -4126,6 +4146,10 @@
           "named": true
         },
         {
+          "type": "default_statement",
+          "named": true
+        },
+        {
           "type": "defer_statement",
           "named": true
         },
@@ -4139,6 +4163,10 @@
         },
         {
           "type": "for_statement",
+          "named": true
+        },
+        {
+          "type": "given_statement",
           "named": true
         },
         {
@@ -4179,6 +4207,10 @@
         },
         {
           "type": "use_version_statement",
+          "named": true
+        },
+        {
+          "type": "when_statement",
           "named": true
         }
       ]
@@ -4217,6 +4249,10 @@
           "named": true
         },
         {
+          "type": "default_statement",
+          "named": true
+        },
+        {
           "type": "defer_statement",
           "named": true
         },
@@ -4230,6 +4266,10 @@
         },
         {
           "type": "for_statement",
+          "named": true
+        },
+        {
+          "type": "given_statement",
           "named": true
         },
         {
@@ -4270,6 +4310,10 @@
         },
         {
           "type": "use_version_statement",
+          "named": true
+        },
+        {
+          "type": "when_statement",
           "named": true
         }
       ]
@@ -5943,6 +5987,10 @@
             "named": true
           },
           {
+            "type": "default_statement",
+            "named": true
+          },
+          {
             "type": "defer_statement",
             "named": true
           },
@@ -5956,6 +6004,10 @@
           },
           {
             "type": "for_statement",
+            "named": true
+          },
+          {
+            "type": "given_statement",
             "named": true
           },
           {
@@ -5992,6 +6044,10 @@
           },
           {
             "type": "use_version_statement",
+            "named": true
+          },
+          {
+            "type": "when_statement",
             "named": true
           }
         ]
@@ -6039,6 +6095,10 @@
             "named": true
           },
           {
+            "type": "default_statement",
+            "named": true
+          },
+          {
             "type": "defer_statement",
             "named": true
           },
@@ -6052,6 +6112,10 @@
           },
           {
             "type": "for_statement",
+            "named": true
+          },
+          {
+            "type": "given_statement",
             "named": true
           },
           {
@@ -6088,6 +6152,10 @@
           },
           {
             "type": "use_version_statement",
+            "named": true
+          },
+          {
+            "type": "when_statement",
             "named": true
           }
         ]
@@ -6330,6 +6398,22 @@
           },
           {
             "type": "variable_declaration",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "default_statement",
+    "named": true,
+    "fields": {
+      "block": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "block",
             "named": true
           }
         ]
@@ -9167,6 +9251,264 @@
     }
   },
   {
+    "type": "given_statement",
+    "named": true,
+    "fields": {
+      "block": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "block",
+            "named": true
+          }
+        ]
+      },
+      "topic": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "(",
+            "named": false
+          },
+          {
+            "type": ")",
+            "named": false
+          },
+          {
+            "type": "ambiguous_function_call_expression",
+            "named": true
+          },
+          {
+            "type": "anonymous_array_expression",
+            "named": true
+          },
+          {
+            "type": "anonymous_hash_expression",
+            "named": true
+          },
+          {
+            "type": "anonymous_method_expression",
+            "named": true
+          },
+          {
+            "type": "anonymous_subroutine_expression",
+            "named": true
+          },
+          {
+            "type": "array",
+            "named": true
+          },
+          {
+            "type": "arraylen",
+            "named": true
+          },
+          {
+            "type": "assignment_expression",
+            "named": true
+          },
+          {
+            "type": "autoquoted_bareword",
+            "named": true
+          },
+          {
+            "type": "await_expression",
+            "named": true
+          },
+          {
+            "type": "bareword",
+            "named": true
+          },
+          {
+            "type": "binary_expression",
+            "named": true
+          },
+          {
+            "type": "command_heredoc_token",
+            "named": true
+          },
+          {
+            "type": "command_string",
+            "named": true
+          },
+          {
+            "type": "conditional_expression",
+            "named": true
+          },
+          {
+            "type": "do_expression",
+            "named": true
+          },
+          {
+            "type": "equality_expression",
+            "named": true
+          },
+          {
+            "type": "eval_expression",
+            "named": true
+          },
+          {
+            "type": "fileglob_expression",
+            "named": true
+          },
+          {
+            "type": "func0op_call_expression",
+            "named": true
+          },
+          {
+            "type": "func1op_call_expression",
+            "named": true
+          },
+          {
+            "type": "function_call_expression",
+            "named": true
+          },
+          {
+            "type": "glob",
+            "named": true
+          },
+          {
+            "type": "goto_expression",
+            "named": true
+          },
+          {
+            "type": "hash",
+            "named": true
+          },
+          {
+            "type": "heredoc_token",
+            "named": true
+          },
+          {
+            "type": "interpolated_string_literal",
+            "named": true
+          },
+          {
+            "type": "list_expression",
+            "named": true
+          },
+          {
+            "type": "localization_expression",
+            "named": true
+          },
+          {
+            "type": "loopex_expression",
+            "named": true
+          },
+          {
+            "type": "lowprec_logical_expression",
+            "named": true
+          },
+          {
+            "type": "map_grep_expression",
+            "named": true
+          },
+          {
+            "type": "match_regexp",
+            "named": true
+          },
+          {
+            "type": "method_call_expression",
+            "named": true
+          },
+          {
+            "type": "postfix_deref",
+            "named": true
+          },
+          {
+            "type": "postinc_expression",
+            "named": true
+          },
+          {
+            "type": "preinc_expression",
+            "named": true
+          },
+          {
+            "type": "primitive",
+            "named": true
+          },
+          {
+            "type": "quoted_regexp",
+            "named": true
+          },
+          {
+            "type": "quoted_word_list",
+            "named": true
+          },
+          {
+            "type": "readline_expression",
+            "named": true
+          },
+          {
+            "type": "refgen_expression",
+            "named": true
+          },
+          {
+            "type": "relational_expression",
+            "named": true
+          },
+          {
+            "type": "require_expression",
+            "named": true
+          },
+          {
+            "type": "require_version_expression",
+            "named": true
+          },
+          {
+            "type": "return_expression",
+            "named": true
+          },
+          {
+            "type": "scalar",
+            "named": true
+          },
+          {
+            "type": "slices",
+            "named": true
+          },
+          {
+            "type": "sort_expression",
+            "named": true
+          },
+          {
+            "type": "string_literal",
+            "named": true
+          },
+          {
+            "type": "stub_expression",
+            "named": true
+          },
+          {
+            "type": "subscripted",
+            "named": true
+          },
+          {
+            "type": "substitution_regexp",
+            "named": true
+          },
+          {
+            "type": "transliteration_expression",
+            "named": true
+          },
+          {
+            "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "undef_expression",
+            "named": true
+          },
+          {
+            "type": "variable_declaration",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "glob",
     "named": true,
     "fields": {},
@@ -10743,6 +11085,10 @@
           "named": true
         },
         {
+          "type": "default_statement",
+          "named": true
+        },
+        {
           "type": "defer_statement",
           "named": true
         },
@@ -10756,6 +11102,10 @@
         },
         {
           "type": "for_statement",
+          "named": true
+        },
+        {
+          "type": "given_statement",
           "named": true
         },
         {
@@ -10800,6 +11150,10 @@
         },
         {
           "type": "use_version_statement",
+          "named": true
+        },
+        {
+          "type": "when_statement",
           "named": true
         }
       ]
@@ -13104,7 +13458,18 @@
   {
     "type": "mandatory_parameter",
     "named": true,
-    "fields": {},
+    "fields": {
+      "type": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "bareword",
+            "named": true
+          }
+        ]
+      }
+    },
     "children": {
       "multiple": false,
       "required": true,
@@ -14204,6 +14569,16 @@
             "named": true
           }
         ]
+      },
+      "returns": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "bareword",
+            "named": true
+          }
+        ]
       }
     },
     "children": {
@@ -14466,6 +14841,16 @@
             "named": true
           }
         ]
+      },
+      "type": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "bareword",
+            "named": true
+          }
+        ]
       }
     },
     "children": {
@@ -14721,6 +15106,16 @@
           },
           {
             "type": "variable_declaration",
+            "named": true
+          }
+        ]
+      },
+      "type": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "bareword",
             "named": true
           }
         ]
@@ -18552,7 +18947,18 @@
   {
     "type": "signature",
     "named": true,
-    "fields": {},
+    "fields": {
+      "returns": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "bareword",
+            "named": true
+          }
+        ]
+      }
+    },
     "children": {
       "multiple": true,
       "required": false,
@@ -19338,7 +19744,18 @@
   {
     "type": "slurpy_parameter",
     "named": true,
-    "fields": {},
+    "fields": {
+      "type": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "bareword",
+            "named": true
+          }
+        ]
+      }
+    },
     "children": {
       "multiple": false,
       "required": true,
@@ -19654,6 +20071,10 @@
           "named": true
         },
         {
+          "type": "default_statement",
+          "named": true
+        },
+        {
           "type": "defer_statement",
           "named": true
         },
@@ -19667,6 +20088,10 @@
         },
         {
           "type": "for_statement",
+          "named": true
+        },
+        {
+          "type": "given_statement",
           "named": true
         },
         {
@@ -19707,6 +20132,10 @@
         },
         {
           "type": "use_version_statement",
+          "named": true
+        },
+        {
+          "type": "when_statement",
           "named": true
         }
       ]
@@ -19759,6 +20188,10 @@
             "named": true
           },
           {
+            "type": "default_statement",
+            "named": true
+          },
+          {
             "type": "defer_statement",
             "named": true
           },
@@ -19772,6 +20205,10 @@
           },
           {
             "type": "for_statement",
+            "named": true
+          },
+          {
+            "type": "given_statement",
             "named": true
           },
           {
@@ -19812,6 +20249,10 @@
           },
           {
             "type": "use_version_statement",
+            "named": true
+          },
+          {
+            "type": "when_statement",
             "named": true
           }
         ]
@@ -19923,6 +20364,16 @@
       "name": {
         "multiple": false,
         "required": true,
+        "types": [
+          {
+            "type": "bareword",
+            "named": true
+          }
+        ]
+      },
+      "returns": {
+        "multiple": false,
+        "required": false,
         "types": [
           {
             "type": "bareword",
@@ -21220,6 +21671,264 @@
     }
   },
   {
+    "type": "when_statement",
+    "named": true,
+    "fields": {
+      "block": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "block",
+            "named": true
+          }
+        ]
+      },
+      "condition": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "(",
+            "named": false
+          },
+          {
+            "type": ")",
+            "named": false
+          },
+          {
+            "type": "ambiguous_function_call_expression",
+            "named": true
+          },
+          {
+            "type": "anonymous_array_expression",
+            "named": true
+          },
+          {
+            "type": "anonymous_hash_expression",
+            "named": true
+          },
+          {
+            "type": "anonymous_method_expression",
+            "named": true
+          },
+          {
+            "type": "anonymous_subroutine_expression",
+            "named": true
+          },
+          {
+            "type": "array",
+            "named": true
+          },
+          {
+            "type": "arraylen",
+            "named": true
+          },
+          {
+            "type": "assignment_expression",
+            "named": true
+          },
+          {
+            "type": "autoquoted_bareword",
+            "named": true
+          },
+          {
+            "type": "await_expression",
+            "named": true
+          },
+          {
+            "type": "bareword",
+            "named": true
+          },
+          {
+            "type": "binary_expression",
+            "named": true
+          },
+          {
+            "type": "command_heredoc_token",
+            "named": true
+          },
+          {
+            "type": "command_string",
+            "named": true
+          },
+          {
+            "type": "conditional_expression",
+            "named": true
+          },
+          {
+            "type": "do_expression",
+            "named": true
+          },
+          {
+            "type": "equality_expression",
+            "named": true
+          },
+          {
+            "type": "eval_expression",
+            "named": true
+          },
+          {
+            "type": "fileglob_expression",
+            "named": true
+          },
+          {
+            "type": "func0op_call_expression",
+            "named": true
+          },
+          {
+            "type": "func1op_call_expression",
+            "named": true
+          },
+          {
+            "type": "function_call_expression",
+            "named": true
+          },
+          {
+            "type": "glob",
+            "named": true
+          },
+          {
+            "type": "goto_expression",
+            "named": true
+          },
+          {
+            "type": "hash",
+            "named": true
+          },
+          {
+            "type": "heredoc_token",
+            "named": true
+          },
+          {
+            "type": "interpolated_string_literal",
+            "named": true
+          },
+          {
+            "type": "list_expression",
+            "named": true
+          },
+          {
+            "type": "localization_expression",
+            "named": true
+          },
+          {
+            "type": "loopex_expression",
+            "named": true
+          },
+          {
+            "type": "lowprec_logical_expression",
+            "named": true
+          },
+          {
+            "type": "map_grep_expression",
+            "named": true
+          },
+          {
+            "type": "match_regexp",
+            "named": true
+          },
+          {
+            "type": "method_call_expression",
+            "named": true
+          },
+          {
+            "type": "postfix_deref",
+            "named": true
+          },
+          {
+            "type": "postinc_expression",
+            "named": true
+          },
+          {
+            "type": "preinc_expression",
+            "named": true
+          },
+          {
+            "type": "primitive",
+            "named": true
+          },
+          {
+            "type": "quoted_regexp",
+            "named": true
+          },
+          {
+            "type": "quoted_word_list",
+            "named": true
+          },
+          {
+            "type": "readline_expression",
+            "named": true
+          },
+          {
+            "type": "refgen_expression",
+            "named": true
+          },
+          {
+            "type": "relational_expression",
+            "named": true
+          },
+          {
+            "type": "require_expression",
+            "named": true
+          },
+          {
+            "type": "require_version_expression",
+            "named": true
+          },
+          {
+            "type": "return_expression",
+            "named": true
+          },
+          {
+            "type": "scalar",
+            "named": true
+          },
+          {
+            "type": "slices",
+            "named": true
+          },
+          {
+            "type": "sort_expression",
+            "named": true
+          },
+          {
+            "type": "string_literal",
+            "named": true
+          },
+          {
+            "type": "stub_expression",
+            "named": true
+          },
+          {
+            "type": "subscripted",
+            "named": true
+          },
+          {
+            "type": "substitution_regexp",
+            "named": true
+          },
+          {
+            "type": "transliteration_expression",
+            "named": true
+          },
+          {
+            "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "undef_expression",
+            "named": true
+          },
+          {
+            "type": "variable_declaration",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "yadayada",
     "named": true,
     "fields": {}
@@ -21322,6 +22031,10 @@
   },
   {
     "type": "--",
+    "named": false
+  },
+  {
+    "type": "-->",
     "named": false
   },
   {
@@ -21606,6 +22319,10 @@
     "named": false
   },
   {
+    "type": "default",
+    "named": false
+  },
+  {
     "type": "defer",
     "named": false
   },
@@ -21763,6 +22480,10 @@
   },
   {
     "type": "getsockname",
+    "named": false
+  },
+  {
+    "type": "given",
     "named": false
   },
   {
@@ -22156,6 +22877,10 @@
   },
   {
     "type": "wantarray",
+    "named": false
+  },
+  {
+    "type": "when",
     "named": false
   },
   {
