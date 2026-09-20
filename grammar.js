@@ -609,6 +609,8 @@ module.exports = grammar({
       $.pointy_block,
       $.named_argument,
       $.reduction_expression,
+      $.zip_cross_expression,
+      $.hyper_expression,
       $.require_expression,
       $.require_version_expression,
       /* UNIOPSUB
@@ -978,6 +980,13 @@ module.exports = grammar({
         field('method', $.method),
         optseq('(', optional(field('arguments', $._expr)), ')')
       )),
+      // Raku hyper method calls: `@a>>.uc`, `@a».uc`
+      prec.left(TERMPREC.ARROW, seq(
+        field('invocant', $._term),
+        choice('>>.', '<<.', '\u00bb.', '\u00ab.'),
+        field('method', $.method),
+        optseq('(', optional(field('arguments', $._expr)), ')')
+      )),
     ),
     method: $ => choice($._bareword, $.scalar),
 
@@ -988,6 +997,13 @@ module.exports = grammar({
       alias($.scalar, $.scalar),
       $.bareword,
     ),
+
+    _zip_cross_op: $ => token(seq(choice('Z', 'X'), optional(/[+*\/~<>=!|&^-]+/))),
+    _hyper_op: $ => token(seq(
+      choice('>>', '<<', '\u00bb', '\u00ab'),
+      /[+*\/~<>=!|&^-]+/,
+      choice('>>', '<<', '\u00bb', '\u00ab')
+    )),
 
     _reduction_op: $ => choice(
       '+', '-', $._GLOB_STAR, '/', $._HASH_PERCENT, '**', '~', '>',
@@ -1006,6 +1022,20 @@ module.exports = grammar({
     // Raku's Whatever star (`*`) used as a term, e.g. `map(* + 1)` or
     // `where * > 0`.
     whatever: $ => $._GLOB_STAR,
+
+    // Raku zip/cross metaoperators: `@a Z @b`, `@a Z+ @b`, `@a X~ @b`
+    zip_cross_expression: $ => prec.left(TERMPREC.ADDOP, seq(
+      field('left', $._term),
+      field('operator', $._zip_cross_op),
+      field('right', $._term),
+    )),
+
+    // Raku hyper metaoperators: `@a >>+<< @b`, `@a \u00bb+\u00ab @b`
+    hyper_expression: $ => prec.left(TERMPREC.ADDOP, seq(
+      field('left', $._term),
+      field('operator', $._hyper_op),
+      field('right', $._term),
+    )),
 
     // Raku reduction metaoperator: `[+] 1, 2, 3`, `[~] <a b c>`, `[<] @x`
     reduction_expression: $ => seq(
