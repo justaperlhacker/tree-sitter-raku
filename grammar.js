@@ -360,7 +360,8 @@ module.exports = grammar({
     method_declaration_statement: $ => seq(
       optional(field('lexical', 'my')),
       subExtensions(),
-      'method',
+      choice('method', 'submethod'),
+      optional(choice('!', '^')),
       field('name', $.bareword),
       optseq(':', optional(field('attributes', $.attrlist))),
       optional(choice($.prototype, $.signature)),
