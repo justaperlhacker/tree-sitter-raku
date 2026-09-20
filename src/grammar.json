@@ -8485,11 +8485,15 @@
         },
         {
           "type": "STRING",
+          "value": "CHECK"
+        },
+        {
+          "type": "STRING",
           "value": "INIT"
         },
         {
           "type": "STRING",
-          "value": "CHECK"
+          "value": "END"
         },
         {
           "type": "STRING",
@@ -8497,7 +8501,55 @@
         },
         {
           "type": "STRING",
-          "value": "END"
+          "value": "ENTER"
+        },
+        {
+          "type": "STRING",
+          "value": "LEAVE"
+        },
+        {
+          "type": "STRING",
+          "value": "KEEP"
+        },
+        {
+          "type": "STRING",
+          "value": "UNDO"
+        },
+        {
+          "type": "STRING",
+          "value": "FIRST"
+        },
+        {
+          "type": "STRING",
+          "value": "LAST"
+        },
+        {
+          "type": "STRING",
+          "value": "NEXT"
+        },
+        {
+          "type": "STRING",
+          "value": "PRE"
+        },
+        {
+          "type": "STRING",
+          "value": "POST"
+        },
+        {
+          "type": "STRING",
+          "value": "CATCH"
+        },
+        {
+          "type": "STRING",
+          "value": "CONTROL"
+        },
+        {
+          "type": "STRING",
+          "value": "COMPOSE"
+        },
+        {
+          "type": "STRING",
+          "value": "START"
         }
       ]
     },

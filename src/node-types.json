@@ -19130,7 +19130,19 @@
             "named": false
           },
           {
+            "type": "CATCH",
+            "named": false
+          },
+          {
             "type": "CHECK",
+            "named": false
+          },
+          {
+            "type": "COMPOSE",
+            "named": false
+          },
+          {
+            "type": "CONTROL",
             "named": false
           },
           {
@@ -19138,7 +19150,47 @@
             "named": false
           },
           {
+            "type": "ENTER",
+            "named": false
+          },
+          {
+            "type": "FIRST",
+            "named": false
+          },
+          {
             "type": "INIT",
+            "named": false
+          },
+          {
+            "type": "KEEP",
+            "named": false
+          },
+          {
+            "type": "LAST",
+            "named": false
+          },
+          {
+            "type": "LEAVE",
+            "named": false
+          },
+          {
+            "type": "NEXT",
+            "named": false
+          },
+          {
+            "type": "POST",
+            "named": false
+          },
+          {
+            "type": "PRE",
+            "named": false
+          },
+          {
+            "type": "START",
+            "named": false
+          },
+          {
+            "type": "UNDO",
             "named": false
           },
           {
@@ -27813,7 +27865,19 @@
     "named": false
   },
   {
+    "type": "CATCH",
+    "named": false
+  },
+  {
     "type": "CHECK",
+    "named": false
+  },
+  {
+    "type": "COMPOSE",
+    "named": false
+  },
+  {
+    "type": "CONTROL",
     "named": false
   },
   {
@@ -27821,7 +27885,47 @@
     "named": false
   },
   {
+    "type": "ENTER",
+    "named": false
+  },
+  {
+    "type": "FIRST",
+    "named": false
+  },
+  {
     "type": "INIT",
+    "named": false
+  },
+  {
+    "type": "KEEP",
+    "named": false
+  },
+  {
+    "type": "LAST",
+    "named": false
+  },
+  {
+    "type": "LEAVE",
+    "named": false
+  },
+  {
+    "type": "NEXT",
+    "named": false
+  },
+  {
+    "type": "POST",
+    "named": false
+  },
+  {
+    "type": "PRE",
+    "named": false
+  },
+  {
+    "type": "START",
+    "named": false
+  },
+  {
+    "type": "UNDO",
     "named": false
   },
   {

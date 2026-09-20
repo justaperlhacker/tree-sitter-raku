@@ -1082,7 +1082,13 @@ module.exports = grammar({
     _KW_FOR: $ => choice('for', 'foreach'),
     _LOOPEX: $ => choice('last', 'next', 'redo'),
 
-    _PHASE_NAME: $ => choice('BEGIN', 'INIT', 'CHECK', 'UNITCHECK', 'END'),
+    // Raku phasers (https://docs.raku.org/language/phasers)
+    _PHASE_NAME: $ => choice(
+      'BEGIN', 'CHECK', 'INIT', 'END', 'UNITCHECK',
+      'ENTER', 'LEAVE', 'KEEP', 'UNDO',
+      'FIRST', 'LAST', 'NEXT', 'PRE', 'POST',
+      'CATCH', 'CONTROL', 'COMPOSE', 'START'
+    ),
 
     // Anything toke.c calls FUN0 or FUN0OP; the distinction does not matter to us
     _func0op: $ => choice(
