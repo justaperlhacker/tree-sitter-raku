@@ -29361,6 +29361,10 @@
     "named": false
   },
   {
+    "type": "returns",
+    "named": false
+  },
+  {
     "type": "rewinddir",
     "named": false
   },
