@@ -73,7 +73,7 @@ const aliasMany = (to, tokens) => tokens.map(t => alias(t, to))
 
 
 // little helper just to keep things DRY
-const subExtensions = () => repeat(choice('extended', 'async'))
+const subExtensions = () => repeat(choice('extended', 'async', 'multi', 'proto', 'only'))
 
 /**
  *
@@ -575,7 +575,7 @@ module.exports = grammar({
         [prec.left, binop, choice('|', '^'), TERMPREC.BITOROP], // _BITORDOP
         [prec.left, binop, '&', TERMPREC.BITANDOP], // _BITANDOP
         [prec.left, binop, choice('<<', '>>'), TERMPREC.SHIFTOP], // _SHIFTOP
-        [prec.left, binop, choice('+', '-', '.'), TERMPREC.ADDOP], // _ADDOP
+        [prec.left, binop, choice('+', '-', '.', '~'), TERMPREC.ADDOP], // _ADDOP
         [prec.left, binop, choice('*', '/', '%', 'x'), TERMPREC.MULOP], // _MULOP
         [prec.left, binop, choice('=~', '!~'), TERMPREC.MATCHOP], // _MATCHOP
       ]

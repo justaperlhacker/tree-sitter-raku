@@ -3842,6 +3842,10 @@
           {
             "type": "||",
             "named": false
+          },
+          {
+            "type": "~",
+            "named": false
           }
         ]
       },
@@ -21862,6 +21866,10 @@
     "named": false
   },
   {
+    "type": "multi",
+    "named": false
+  },
+  {
     "type": "my",
     "named": false
   },
@@ -21887,6 +21895,10 @@
   },
   {
     "type": "oct",
+    "named": false
+  },
+  {
+    "type": "only",
     "named": false
   },
   {
@@ -21916,6 +21928,10 @@
   },
   {
     "type": "pos",
+    "named": false
+  },
+  {
+    "type": "proto",
     "named": false
   },
   {

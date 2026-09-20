@@ -1029,6 +1029,18 @@
               {
                 "type": "STRING",
                 "value": "async"
+              },
+              {
+                "type": "STRING",
+                "value": "multi"
+              },
+              {
+                "type": "STRING",
+                "value": "proto"
+              },
+              {
+                "type": "STRING",
+                "value": "only"
               }
             ]
           }
@@ -1140,6 +1152,18 @@
               {
                 "type": "STRING",
                 "value": "async"
+              },
+              {
+                "type": "STRING",
+                "value": "multi"
+              },
+              {
+                "type": "STRING",
+                "value": "proto"
+              },
+              {
+                "type": "STRING",
+                "value": "only"
               }
             ]
           }
@@ -3490,6 +3514,10 @@
                     {
                       "type": "STRING",
                       "value": "."
+                    },
+                    {
+                      "type": "STRING",
+                      "value": "~"
                     }
                   ]
                 }
@@ -4275,6 +4303,18 @@
               {
                 "type": "STRING",
                 "value": "async"
+              },
+              {
+                "type": "STRING",
+                "value": "multi"
+              },
+              {
+                "type": "STRING",
+                "value": "proto"
+              },
+              {
+                "type": "STRING",
+                "value": "only"
               }
             ]
           }
@@ -4362,6 +4402,18 @@
               {
                 "type": "STRING",
                 "value": "async"
+              },
+              {
+                "type": "STRING",
+                "value": "multi"
+              },
+              {
+                "type": "STRING",
+                "value": "proto"
+              },
+              {
+                "type": "STRING",
+                "value": "only"
               }
             ]
           }
