@@ -614,6 +614,7 @@ module.exports = grammar({
       $.whatever,
       $.pointy_block,
       $.named_argument,
+      $.radix_number,
       $.but_expression,
       $.anonymous_role_expression,
       $.reduction_expression,
@@ -1045,6 +1046,9 @@ module.exports = grammar({
       alias(token.immediate(/<[^>\n]*>/), $.operator),
     ),
 
+
+    // Raku radix literal: `:16<ff>`, `:2<101>`
+    radix_number: $ => token(seq(':', /[0-9]+/, '<', /[0-9a-zA-Z]+/, '>')),
 
     // Raku's Whatever star (`*`) used as a term, e.g. `map(* + 1)` or
     // `where * > 0`.

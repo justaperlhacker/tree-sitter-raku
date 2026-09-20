@@ -4863,6 +4863,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "radix_number"
+        },
+        {
+          "type": "SYMBOL",
           "name": "but_expression"
         },
         {
@@ -9372,6 +9376,34 @@
         }
       ]
     },
+    "radix_number": {
+      "type": "TOKEN",
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "STRING",
+            "value": ":"
+          },
+          {
+            "type": "PATTERN",
+            "value": "[0-9]+"
+          },
+          {
+            "type": "STRING",
+            "value": "<"
+          },
+          {
+            "type": "PATTERN",
+            "value": "[0-9a-zA-Z]+"
+          },
+          {
+            "type": "STRING",
+            "value": ">"
+          }
+        ]
+      }
+    },
     "whatever": {
       "type": "SYMBOL",
       "name": "_GLOB_STAR"
@@ -13018,6 +13050,28 @@
               {
                 "type": "PATTERN",
                 "value": "\\d(_?\\d)*"
+              },
+              {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "STRING",
+                        "value": "0d"
+                      },
+                      {
+                        "type": "STRING",
+                        "value": "0D"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "PATTERN",
+                    "value": "\\d(_?\\d)*"
+                  }
+                ]
               }
             ]
           },
@@ -13066,15 +13120,42 @@
             ]
           },
           {
-            "type": "SEQ",
+            "type": "CHOICE",
             "members": [
               {
-                "type": "STRING",
-                "value": "0"
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "STRING",
+                    "value": "0"
+                  },
+                  {
+                    "type": "PATTERN",
+                    "value": "[0-7](_?[0-7])*"
+                  }
+                ]
               },
               {
-                "type": "PATTERN",
-                "value": "[0-7](_?[0-7])*"
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "STRING",
+                        "value": "0o"
+                      },
+                      {
+                        "type": "STRING",
+                        "value": "0O"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "PATTERN",
+                    "value": "[0-7](_?[0-7])*"
+                  }
+                ]
               }
             ]
           }
