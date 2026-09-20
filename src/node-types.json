@@ -5144,11 +5144,19 @@
       }
     },
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": false,
       "types": [
         {
+          "type": "bareword",
+          "named": true
+        },
+        {
           "type": "block",
+          "named": true
+        },
+        {
+          "type": "scalar",
           "named": true
         }
       ]
@@ -23380,11 +23388,19 @@
       }
     },
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": false,
       "types": [
         {
+          "type": "bareword",
+          "named": true
+        },
+        {
           "type": "block",
+          "named": true
+        },
+        {
+          "type": "scalar",
           "named": true
         }
       ]
@@ -27806,6 +27822,10 @@
   },
   {
     "type": ":!",
+    "named": false
+  },
+  {
+    "type": "::",
     "named": false
   },
   {

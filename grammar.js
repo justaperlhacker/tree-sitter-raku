@@ -75,6 +75,7 @@ const aliasMany = (to, tokens) => tokens.map(t => alias(t, to))
 // little helper just to keep things DRY
 const subExtensions = () => repeat(choice('extended', 'async', 'multi', 'proto', 'only'))
 const paramType = ($) => optional(field('type', $.bareword))
+const typeParams = ($) => optional(seq('[', optional(seq($._type_parameter, repeat(seq(',', $._type_parameter)), optional(','))), ']'))
 const traits = ($) => repeat(choice(
   seq(choice('is', 'does'), field('trait', $.bareword), optseq('(', optional(field('arguments', $._expr)), ')')),
   seq('handles', field('handles', $._term)),
@@ -243,12 +244,14 @@ module.exports = grammar({
       seq('class',
         field('name', $.package),
         optional(field('version', $._version)),
+        typeParams($),
         optseq(':', optional(field('attributes', $.attrlist))),
         traits($),
         $._semicolon),
       seq('class',
         field('name', $.package),
         optional(field('version', $._version)),
+        typeParams($),
         optseq(':', optional(field('attributes', $.attrlist))),
         traits($),
         $.block),
@@ -257,12 +260,14 @@ module.exports = grammar({
       seq('role',
         field('name', $.package),
         optional(field('version', $._version)),
+        typeParams($),
         optseq(':', optional(field('attributes', $.attrlist))),
         traits($),
         $._semicolon),
       seq('role',
         field('name', $.package),
         optional(field('version', $._version)),
+        typeParams($),
         optseq(':', optional(field('attributes', $.attrlist))),
         traits($),
         $.block),
@@ -974,6 +979,13 @@ module.exports = grammar({
     method: $ => choice($._bareword, $.scalar),
 
     // Raku user-defined operator name: `infix:<+>`, `prefix:<->`, `term:<now>`
+    // Raku type/value parameter: `role R[::T] { }`, `role R[$x] { }`
+    _type_parameter: $ => choice(
+      seq('::', $.bareword),
+      alias($.scalar, $.scalar),
+      $.bareword,
+    ),
+
     _operator_name: $ => seq(
       choice('infix', 'prefix', 'postfix', 'circumfix', 'postcircumfix', 'term'),
       ':',
